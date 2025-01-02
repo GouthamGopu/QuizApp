@@ -3,21 +3,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Question from "@/components/Question";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const App = () => {
   const [activeTab, setActiveTab] = useState("1");
   const [answers, setAnswers] = useState({});
   const [score, setScore] = useState(0);
   const [quizData, setQuizData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(18);
 
   const categories = [
     { id: 18, name: "Science: Computers" }, 
   ];
 
-
   useEffect(() => {
     const fetchQuizData = async () => {
+      setLoading(true);
       const response = await fetch(`https://opentdb.com/api.php?amount=5&category=${selectedCategory}&type=multiple`);
       const data = await response.json();
       const formattedQuizData = data.results.map((item) => ({
@@ -26,6 +28,7 @@ const App = () => {
         answer: item.correct_answer,
       }));
       setQuizData(formattedQuizData);
+      setLoading(false);
     };
 
     fetchQuizData();
@@ -52,9 +55,18 @@ const App = () => {
     setScore(newScore);
   };
 
+  const allQuestionsAnswered = quizData.every((_, index) => answers[index + 1]);
+
   return (
     <div className="h-screen">
       <h1 className="font-bold text-xl p-6">Computer Science Quiz</h1>
+      {loading && <div className="flex flex-col space-y-3">
+        <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-[250px]" />
+          <Skeleton className="h-4 w-[200px]" />
+        </div>
+      </div>}
       {quizData.length > 0 && (
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value)} className="w-[60%] px-4">
           <TabsList className="bg-black">
@@ -74,12 +86,22 @@ const App = () => {
               />
               <div className="flex justify-between mt-4">
                 {index < quizData.length - 1 && (
-                  <Button onClick={() => handleNext(index + 2)}>Next</Button>
+                  <Button
+                    onClick={() => handleNext(index + 2)}
+                    disabled={!answers[index + 1]} // Disable if no answer is selected
+                  >
+                    Next
+                  </Button>
                 )}
                 {index === quizData.length - 1 && (
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline" className="text-black" onClick={handleSubmit}>
+                      <Button
+                        variant="outline"
+                        className="text-black"
+                        onClick={handleSubmit}
+                        disabled={!allQuestionsAnswered} // Disable if not all questions are answered
+                      >
                         Submit
                       </Button>
                     </DialogTrigger>
