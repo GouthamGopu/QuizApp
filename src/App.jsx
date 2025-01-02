@@ -1,35 +1,35 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Question from '@/components/Question';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [activeTab, setActiveTab] = useState("1");
+
+  const handleNext = (nextTab) => {
+    setActiveTab(nextTab.toString());
+  };
 
   return (
-    <>
+    <div className='h-screen'>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h1 className='font-bold text-xl p-6'>Quiz App</h1>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value)} className="w-[60%] px-4">
+        <TabsList className='bg-black'>
+          <TabsTrigger value="1">Question 1</TabsTrigger>
+          <TabsTrigger value="2">Question 2</TabsTrigger>
+          <TabsTrigger value="3">Question 3</TabsTrigger>
+          <TabsTrigger value="4">Question 4</TabsTrigger>
+          <TabsTrigger value="5">Question 5</TabsTrigger>
+        </TabsList>
+        <TabsContent value="1"><Question i={1} onNext={handleNext} /></TabsContent>
+        <TabsContent value="2"><Question i={2} onNext={handleNext} /></TabsContent>
+        <TabsContent value="3"><Question i={3} onNext={handleNext} /></TabsContent>
+        <TabsContent value="4"><Question i={4} onNext={handleNext} /></TabsContent>
+        <TabsContent value="5"><Question i={5} onNext={handleNext} /></TabsContent>
+      </Tabs>
+    </div>
+  );
+};
 
-export default App
+export default App;
